@@ -14,44 +14,147 @@ namespace FightSimulation
     }
     class Game
     {
+        bool gameOver = false;
+        //Current fighters
+        Monster currentMonster1;
+        Monster currentMonster2;
+
+        int currentMonsterIndex = 1;
+        //Monster 1
+        Monster wompus;
+        //Monster 2
+        Monster thwompus;
+        //Monster 3
+        Monster backupWompus;
+        //Monster 4
+        Monster unclePhil;
+
         public void Run()
         {
-            //Monster 1
-            Monster monster1;
-            monster1.name = "Wompus";
-            monster1.attack = 10.0f;
-            monster1.defense = 5.0f;
-            monster1.health = 20.0f;
+            
+            wompus.name = "Wompus";
+            wompus.attack = 15.0f;
+            wompus.defense = 5.0f;
+            wompus.health = 20.0f;
 
-            //Monster 2
-            Monster monster2;
-            monster2.name = "Thwompus";
-            monster2.attack = 10.0f;
-            monster2.defense = 5.0f;
-            monster2.health = 20.0f;
+           
+            thwompus.name = "Thwompus";
+            thwompus.attack = 20.0f;
+            thwompus.defense = 10.0f;
+            thwompus.health = 15.0f;
 
+            
+            backupWompus.name = "Backup Wompus";
+            backupWompus.attack = 25.6f;
+            backupWompus.defense = 5.0f;
+            backupWompus.health = 3.0f;
+
+            
+            unclePhil.name = "Uncle Phil";
+            unclePhil.attack = 1000000;
+            unclePhil.defense = 0;
+            unclePhil.health = 1.0f;
+
+            while(!gameOver)
+            {
+
+            }
+
+        }
+
+        void Update()
+        {
+            Battle();
+        }
+
+        Monster GetMonster(int monsterIndex)
+        {
+            Monster monster;
+            monster.name = "None";
+
+
+            if (monsterIndex == 1)
+            {
+               monster = unclePhil;
+            }
+            else if (monsterIndex == 2)
+            {
+                monster = backupWompus;
+            }
+            else if (monsterIndex == 3)
+            {
+                monster = wompus;
+            }
+            else if(monsterIndex == 4)
+            {
+                monster = thwompus;
+            }
+
+            return monster;
+        }
+
+        void Battle()
+        {
             //Print monster1 stats
-            PrintStats(monster1);
+            PrintStats(currentMonster1);
             //Print monster2 stats
-            PrintStats(monster2);
+            PrintStats(currentMonster2);
 
             //Monster 1 attacks monster 2
-            float damageTaken = Fight(monster1, monster2);
-            Console.WriteLine(monster2.name + " has taken " + damageTaken);
+            float damageTaken = Fight(currentMonster1, ref currentMonster2);
+            Console.WriteLine(currentMonster2.name + " has taken " + damageTaken);
 
-            //Monster2 attacks monster1
-            damageTaken = Fight(monster2, monster1);
-            Console.WriteLine(monster1.name + " has taken " + damageTaken);
+            //Monster 2 attacks monster 1
+            damageTaken = Fight(currentMonster2, ref currentMonster1);
+            Console.WriteLine(currentMonster1.name + " has taken " + damageTaken);
 
-            Console.ReadKey();
+            Console.ReadKey(true);
             Console.Clear();
+        }
 
-            //Print monster1 stats
-            PrintStats(monster1);
-            //Print monster2 stats
-            PrintStats(monster2);
-            Console.ReadKey();
+        void UpdateCurrentMonsters()
+        {
+            if()
+        }
 
+        string StartBattle(ref Monster monster1, ref Monster monster2)
+        {
+            string matchResult = "No Contest";
+
+            while (monster1.health > 0 && monster2.health > 0)
+            {
+                //Print monster1 stats
+                PrintStats(monster1);
+                //Print monster2 stats
+                PrintStats(monster2);
+
+                //Monster 1 attacks monster 2
+                float damageTaken = Fight(monster1, ref monster2);
+                Console.WriteLine(monster2.name + " has taken " + damageTaken);
+
+                //Monster 2 attacks monster 1
+                damageTaken = Fight(monster2, ref monster1);
+                Console.WriteLine(monster1.name + " has taken " + damageTaken);
+
+                Console.ReadKey(true);
+                Console.Clear();
+            }
+
+            if(monster1.health < 0 && monster2.health < 0)
+            {
+                matchResult = "Draw";
+            }
+            else if(monster1.health > 0)
+            {
+                matchResult = monster1.name;
+            }
+            else if(monster2.health > 0)
+            {
+                matchResult = monster2.name;
+            }
+           
+            //Monster who the battle
+            return matchResult;
         }
 
         /// <summary>
@@ -75,24 +178,18 @@ namespace FightSimulation
         /// <param name="attack">Monsters attack value</param>
         /// <param name="defense">Monsters defense value</param>
         /// <returns></returns>
-        float CalculateDamage(float attack, float defense)
-        {
-            float damage = attack - defense;
-
-            if(damage <= 0)
-            {
-                damage = 0;
-            }
-
-            return damage;
-        }
-
         float CalculateDamage(Monster attacker, Monster defender)
         {
             return attacker.attack - defender.defense;
         }
 
-        float Fight(Monster attacker, Monster defender)
+        /// <summary>
+        /// Calculates health after damage has been taken from the monster using defense
+        /// </summary>
+        /// <param name="attacker"></param>
+        /// <param name="defender"></param>
+        /// <returns></returns>
+        float Fight(Monster attacker, ref Monster defender)
         {
             float damageTaken = CalculateDamage(attacker,defender);
             defender.health -= damageTaken;
